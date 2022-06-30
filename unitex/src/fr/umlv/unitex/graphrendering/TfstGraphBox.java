@@ -1,7 +1,7 @@
 /*
  * Unitex
  *
- * Copyright (C) 2001-2021 UniversitÃ© Paris-Est Marne-la-VallÃ©e <unitex@univ-mlv.fr>
+ * Copyright (C) 2001-2021 Université Paris-Est Marne-la-Vallée <unitex@univ-mlv.fr>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -37,7 +37,7 @@ import fr.umlv.unitex.tfst.Bounds;
 /**
  * This class describes a box of a sentence automaton.
  * 
- * @author SÃ©bastien Paumier
+ * @author Sébastien Paumier
  */
 public class TfstGraphBox extends GenericGraphBox {
 	private Bounds bounds;
@@ -329,4 +329,6 @@ public class TfstGraphBox extends GenericGraphBox {
 		}	
 		return content;
 	}
+
 }
+	

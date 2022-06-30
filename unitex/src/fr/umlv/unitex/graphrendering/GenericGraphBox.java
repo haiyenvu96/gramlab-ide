@@ -1785,5 +1785,7 @@ public class GenericGraphBox {
 			}
 		}
 	}
-
+	public void setState(TaggingState preferred) {
+		state = preferred;
+	}
 }

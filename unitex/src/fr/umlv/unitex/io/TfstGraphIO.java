@@ -1,7 +1,7 @@
 /*
  * Unitex
  *
- * Copyright (C) 2001-2021 Université Paris-Est Marne-la-Vallée <unitex@univ-mlv.fr>
+ * Copyright (C) 2001-2021 UniversitÃ© Paris-Est Marne-la-VallÃ©e <unitex@univ-mlv.fr>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -36,6 +36,7 @@ import javax.swing.JOptionPane;
 import fr.umlv.unitex.Unitex;
 import fr.umlv.unitex.common.project.manager.GlobalProjectManager;
 import fr.umlv.unitex.config.ConfigManager;
+import fr.umlv.unitex.graphrendering.TfstGraphicalZone;
 import fr.umlv.unitex.config.PreferencesManager;
 import fr.umlv.unitex.frames.InternalFrameManager;
 import fr.umlv.unitex.graphrendering.GenericGraphBox;
@@ -44,23 +45,37 @@ import fr.umlv.unitex.graphrendering.GraphBox;
 import fr.umlv.unitex.graphrendering.TfstGraphBox;
 import fr.umlv.unitex.grf.GraphMetaData;
 import fr.umlv.unitex.grf.GraphPresentationInfo;
-import fr.umlv.unitex.tfst.tagging.TaggingState;
+import fr.umlv.unitex.io.UnicodeIO;
+import fr.umlv.unitex.io.Encoding;
+import fr.umlv.unitex.io.GraphIO;
 
 /**
  * This class provides methods for loading and saving graphs.
  * 
- * @author Sébastien Paumier
+ * @author SÃ©bastien Paumier
  */
-public class GraphIO {
+public class TfstGraphIO extends GraphIO {
+	public TfstGraphIO(GenericGraphicalZone zone) {
+		super(zone);
+		info = zone.getGraphPresentationInfo();
+		width = zone.getWidth();
+		height = zone.getHeight();
+		boxes = zone.getBoxes();
+		metadata = zone.getMetadata();
+		graphicalZone = (TfstGraphicalZone) zone;
+		// TODO Auto-generated constructor stub
+	}
+
+	TfstGraphicalZone graphicalZone;                                   
+	
 	/**
 	 * Boxes of a graph
 	 */
 	private ArrayList<GenericGraphBox> boxes;
-	private ArrayList<TfstGraphBox> Tfstboxes;
 	/**
 	 * Rendering properties of a graph
 	 */
-	private final GraphPresentationInfo info;
+	private GraphPresentationInfo info;
 	/**
 	 * Width of a graph
 	 */
@@ -74,22 +89,15 @@ public class GraphIO {
 	 */
 	private int nBoxes;
 	private File grf;
-	private final GraphMetaData metadata;
-
-	private GraphIO() {
+	private GraphMetaData metadata;
+	
+	private void TfstGraphIO() {
 		info = ConfigManager.getManager().getGraphPresentationPreferences(null)
 				.clone();
 		metadata = new GraphMetaData();
 	}
 
-	public GraphIO(GenericGraphicalZone zone) {
-		info = zone.getGraphPresentationInfo();
-		width = zone.getWidth();
-		height = zone.getHeight();
-		boxes = zone.getBoxes();
-		metadata = zone.getMetadata();
-	}
-
+	
 	/**
 	 * This method loads a graph. 
 	 * If the specified graph is not found, it provides an option to create a new one with the same name.
@@ -98,6 +106,7 @@ public class GraphIO {
 	 *            name of the graph
 	 * @return a <code>GraphIO</code> object describing the graph
 	 */
+/*
 	public static GraphIO loadGraph(File grfFile, boolean isSentenceGraph,
 			boolean emitErrorMessage) {
 		final GraphIO res = new GraphIO();
@@ -179,7 +188,9 @@ public class GraphIO {
 			UnicodeIO.skipLine(reader); // ignoring DRST
 			UnicodeIO.skipLine(reader); // ignoring FITS
 			UnicodeIO.skipLine(reader); // ignoring PORIENT
+*/
 			/* Reading metadata until we find the # line */
+/*			
 			String line;
 			while (!(line = UnicodeIO.readLine(reader)).equals("#")) {
 				final int pos = line.indexOf("=");
@@ -244,7 +255,8 @@ public class GraphIO {
 		}
 		return res;
 	}
-
+*/
+/*
 	private void readSize(InputStreamReader r) throws IOException {
 		// skipping the chars preceeding the width and height
 		UnicodeIO.skipChars(r, 5);
@@ -527,7 +539,6 @@ public class GraphIO {
 			} else
 				s = s + (char) c;
 		}
-		
 		// skipping the space after "
 		if (UnicodeIO.readChar(r) != ' ')
 			throw new IOException("Error #6 while reading graph box #" + n);
@@ -571,7 +582,6 @@ public class GraphIO {
 		if (c == -1)
 			throw new IOException("Error #12 while reading graph box #" + n);
 		y = y * neg;
-
 		g.setX(x);
 		g.setY(y);
 		g.setX1(g.getX());
@@ -610,20 +620,12 @@ public class GraphIO {
 				throw new IOException("Error #14 while reading graph box #" + n);
 			g.addTransitionTo(boxes.get(dest));
 		}
-		// checking the preferred box or not and skipping the end-of-line
-		int foo = UnicodeIO.readChar(r);
-		if (foo == 'p') {
-			int end = UnicodeIO.readChar(r);
-			if (end != '\n') {
-				throw new IOException("Error #15 while reading graph box #" + n);
-			}
-		}
-		else if (foo != '\n') {
+		// skipping the end-of-line
+		final int foo = UnicodeIO.readChar(r);
+		if (foo != '\n')
 			throw new IOException("Error #15 while reading graph box #" + n);
-		}
-		
 	}
-
+*/
 	/**
 	 * Saves the graph referenced by the field of this <code>GraphIO</code>
 	 * object
@@ -631,7 +633,9 @@ public class GraphIO {
 	 * @param grfFile
 	 *            graph file
 	 */
+/*
 	public void saveGraph(File grfFile) {
+		
 		if (info == null) {
 			throw new IllegalStateException(
 					"Should not save a graph with null graph information");
@@ -663,6 +667,7 @@ public class GraphIO {
 			PreferencesManager.getUserPreferences().addRecentGraph(grfFile);
 		}
 		try {
+			System.out.println("saveGraph is running...");
 			final Encoding e = ConfigManager.getManager().getEncoding(null);
 			writer = e.getOutputStreamWriter(grfFile);
 			UnicodeIO.writeString(writer, "#Unigraph\n");
@@ -760,12 +765,12 @@ public class GraphIO {
 			UnicodeIO.writeString(writer, "#\n");
 			nBoxes = boxes.size();
 			UnicodeIO.writeString(writer, String.valueOf(nBoxes) + "\n");
+			
 			for (int i = 0; i < nBoxes; i++) {
 				final GenericGraphBox g = boxes.get(i);
 				UnicodeIO.writeChar(writer, '"');
 				if (g.getType() != 1)
 					writeBoxContent(writer, g.getContent());
-				
 				final int N = g.getTransitions().size();
 				UnicodeIO.writeString(
 						writer,
@@ -779,6 +784,33 @@ public class GraphIO {
 				}
 				UnicodeIO.writeChar(writer, '\n');
 			}
+*/
+			/*
+			for (int i = 0; i < nBoxes; i++) {
+				final GenericGraphBox g = boxes.get(i);
+				UnicodeIO.writeChar(writer, '"');
+				if (g.getType() != 1)
+					{if (graphicalZone.isBoxNotPreferred((TfstGraphBox) g))
+						{writeBoxContent(writer, g.getContent());}
+				else {
+					writeBoxContent(writer, "PREFERED - " + g.getContent());}
+			}
+			
+					
+				final int N = g.getTransitions().size();
+				UnicodeIO.writeString(
+						writer,
+						"\" " + String.valueOf(g.getX()) + " "
+								+ String.valueOf(g.getY()) + " "
+								+ String.valueOf(N) + " ");
+				for (int j = 0; j < N; j++) {
+					final GenericGraphBox tmp = g.getTransitions().get(j);
+					UnicodeIO.writeString(writer,
+							String.valueOf(boxes.indexOf(tmp)) + " ");
+				}
+				UnicodeIO.writeChar(writer, '\n');
+			}
+
 			writer.close();
 		} catch (final FileNotFoundException e) {
 			e.printStackTrace();
@@ -786,7 +818,7 @@ public class GraphIO {
 			e.printStackTrace();
 		}
 	}
-
+*/
 	private void writeBoxContent(OutputStreamWriter w, String s) {
 		final int L = s.length();
 		char c;
@@ -811,20 +843,18 @@ public class GraphIO {
 			}
 		}
 	}
-
+/*
 	private void readSentenceGraphLine(InputStreamReader r, int n) {
 		final TfstGraphBox g = (TfstGraphBox) boxes.get(n);
 		if (UnicodeIO.readChar(r) == 's') {
 			// is a "s" was read, then we read the " char
 			UnicodeIO.readChar(r);
-			
 		}
 		String s = "";
 		char c;
-		while ((c = (char) UnicodeIO.readChar(r)) !=
-				'"') {
+		while ((c = (char) UnicodeIO.readChar(r)) != '"') {
 			if (c == '\\') {
-				c = (char) UnicodeIO.readChar(r);	
+				c = (char) UnicodeIO.readChar(r);
 				if (c != '\\') {
 					// case of \: \+ and \"
 					if (c == '"')
@@ -846,7 +876,6 @@ public class GraphIO {
 			} else
 				s = s + c;
 		}
-		System.out.println("s" + s);
 		// skipping the space after "
 		UnicodeIO.readChar(r);
 		// reading the X coordinate
@@ -894,17 +923,11 @@ public class GraphIO {
 			while (UnicodeIO.isDigit((c = (char) UnicodeIO.readChar(r))))
 				dest = dest * 10 + (c - '0');
 			g.addTransitionTo(boxes.get(dest));
-			System.out.println("dest" + dest);
 		}
-		// checking whether the tag is preferred or not then skipping the end-of-line
-		if ((char)UnicodeIO.readChar(r)=='p') {
-			g.setState(TaggingState.PREFERRED);
-			UnicodeIO.readChar(r);
-			UnicodeIO.readChar(r);}
-		else {g.setState(TaggingState.NOT_PREFERRED);}
+		// skipping the end-of-line
+		UnicodeIO.readChar(r);
 	}
-		
-
+*/
 	/**
 	 * Saves the sentence graph described by the fields of this
 	 * <code>GraphIO</code> object.
@@ -912,10 +935,14 @@ public class GraphIO {
 	 * @param file
 	 *            sentence graph file
 	 */
+	@Override
+	
 	public void saveSentenceGraph(File file, GraphPresentationInfo inf) {
 		OutputStreamWriter writer;
+		
 		try {
-			if (!file.exists())				file.createNewFile();
+			if (!file.exists())
+				file.createNewFile();
 		} catch (final IOException e) {
 			JOptionPane.showMessageDialog(null,
 					"Cannot write " + file.getAbsolutePath(), "Error",
@@ -929,6 +956,8 @@ public class GraphIO {
 			return;
 		}
 		try {
+			System.out.println("saveSentenceGraph is running...");
+			System.out.println("boxes = "+ boxes );
 			writer = ConfigManager.getManager().getEncoding(null)
 					.getOutputStreamWriter(file);
 			UnicodeIO.writeChar(writer, (char) 0xFEFF);
@@ -1023,6 +1052,7 @@ public class GraphIO {
 			UnicodeIO.writeString(writer, "#\n");
 			nBoxes = boxes.size();
 			UnicodeIO.writeString(writer, String.valueOf(nBoxes) + "\n");
+			
 			for (int i = 0; i < nBoxes; i++) {
 				final TfstGraphBox g = (TfstGraphBox) boxes.get(i);
 				UnicodeIO.writeChar(writer, '"');
@@ -1034,17 +1064,38 @@ public class GraphIO {
 						content = "<E>";
 						N = 0;
 					}
+					/**
 					if (i >= 2) {
 						if (g.getBounds() != null) {
-							content = content + "/" + g.getBounds();
+							if( graphicalZone.isBoxNotPreferred((TfstGraphBox) g))
+								{content = content + "/" + g.getBounds();}
+							else {
+								content = content + "/" + g.getBounds() + " p";}
 						} else {
-							/* Should not happen */
+						
 							throw new AssertionError(
 									"Bounds should not be null for a box content != <E>");
 						}
 					}
+**/	
+					if (i >= 2) {
+						if (g.getBounds() != null) {
+							content = content + "/" + g.getBounds();
+						} else {
+							
+							throw new AssertionError(
+									"Bounds should not be null for a box content != <E>");
+						}
+					}
+
+
+					
 					writeBoxContent(writer, content);
+
 				}
+				
+					
+	
 				UnicodeIO.writeString(
 						writer,
 						"\" " + String.valueOf(g.getX()) + " "
@@ -1055,7 +1106,12 @@ public class GraphIO {
 							.get(j);
 					UnicodeIO.writeString(writer,
 							String.valueOf(boxes.indexOf(tmp)) + " ");
-				}
+				}					
+				if (graphicalZone.isBoxNotPreferred((TfstGraphBox) g)) 
+					{}
+				else
+					{UnicodeIO.writeString(
+							writer, "p "); }
 				UnicodeIO.writeChar(writer, '\n');
 			}
 			writer.close();
@@ -1066,53 +1122,4 @@ public class GraphIO {
 		}
 	}
 
-	public GraphPresentationInfo getInfo() {
-		return info;
-	}
-
-	public ArrayList<GenericGraphBox> getBoxes() {
-		return boxes;
-	}
-	public ArrayList<TfstGraphBox> getTfstBoxes() {
-		return Tfstboxes;
-	}
-
-	public int getWidth() {
-		return width;
-	}
-
-	public int getHeight() {
-		return height;
-	}
-
-	public int getnBoxes() {
-		return nBoxes;
-	}
-
-	public File getGrf() {
-		return grf;
-	}
-
-	public GraphMetaData getMetadata() {
-		return metadata;
-	}
-
-	public static void createNewGrf(File f) {
-		final GraphIO gio = createEmptyGraphIO();
-		gio.saveGraph(f);
-	}
-
-	private static GraphIO createEmptyGraphIO() {
-		final GraphIO gio = new GraphIO();
-		gio.width = 1188;
-		gio.height = 840;
-		gio.boxes = new ArrayList<GenericGraphBox>();
-		GraphBox b = new GraphBox(70, 200, 0, null);
-		b.setContent("<E>");
-		gio.boxes.add(b);
-		b = new GraphBox(300, 200, 1, null);
-		b.setContent("");
-		gio.boxes.add(b);
-		return gio;
-	}
 }

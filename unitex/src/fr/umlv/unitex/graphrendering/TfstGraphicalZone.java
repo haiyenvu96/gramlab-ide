@@ -1,7 +1,7 @@
 /*
  * Unitex
  *
- * Copyright (C) 2001-2021 UniversitÃ© Paris-Est Marne-la-VallÃ©e <unitex@univ-mlv.fr>
+ * Copyright (C) 2001-2021 Université Paris-Est Marne-la-Vallée <unitex@univ-mlv.fr>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -54,7 +54,7 @@ import fr.umlv.unitex.undo.SelectEdit;
 /**
  * This class describes a component on which a sentence graph can be drawn.
  *
- * @author SÃ©bastien Paumier
+ * @author Sébastien Paumier
  */
 public class TfstGraphicalZone extends GenericGraphicalZone implements
 		Printable {
@@ -147,6 +147,7 @@ public class TfstGraphicalZone extends GenericGraphicalZone implements
 					// if we click on a box
 					b = (TfstGraphBox) graphBoxes.get(boxSelected);
 					model.preferBox(b);
+					fireGraphChanged(true);
 				} else {
 //					if (selectedBoxes.size() == 1) {
 //						TfstGraphBox selected = (TfstGraphBox) selectedBoxes.get(0);
@@ -493,6 +494,7 @@ public class TfstGraphicalZone extends GenericGraphicalZone implements
 			b.context = (Graphics2D) this.getGraphics();
 			b.parentGraphicalZone = this;
 			b.update();
+			
 		}
 		this.sentence=sentence;
 		setGraphPresentationInfo(g.getInfo());
@@ -507,6 +509,7 @@ public class TfstGraphicalZone extends GenericGraphicalZone implements
 				model.updateAutomatonLinearity();
 			}
 		}
+		
 		revalidate();
 		repaint();
 	}
@@ -527,7 +530,7 @@ public class TfstGraphicalZone extends GenericGraphicalZone implements
 	public TaggingModel getTaggingModel() {
 		return model;
 	}
-
+	
 	public void unsureBoxIsVisible(int index) {
 		final TfstGraphBox b = (TfstGraphBox) graphBoxes.get(index);
 		final JViewport viewport = ((TfstFrame) parentFrame).getTfstScrollPane()

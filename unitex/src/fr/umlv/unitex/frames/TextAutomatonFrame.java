@@ -47,6 +47,7 @@ import fr.umlv.unitex.tfst.TagFilter;
 import fr.umlv.unitex.tfst.TfstTableModel;
 import fr.umlv.unitex.tfst.TokensInfo;
 import fr.umlv.unitex.utils.KeyUtil;
+import fr.umlv.unitex.io.TfstGraphIO;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -67,6 +68,13 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  * This class describes a frame used to display sentence automata.
@@ -411,7 +419,7 @@ public class TextAutomatonFrame extends TfstFrame {
 				table.getColumnName(column), false, false, 0, column)
 				.getPreferredSize().width;
 		if (w > max)
-			max = w;
+	 		max = w;
 		for (int row = 0; row < table.getRowCount(); row++) {
 			w = renderer.getTableCellRendererComponent(table,
 					table.getValueAt(row, column), false, false, row, column)
@@ -556,6 +564,7 @@ public class TextAutomatonFrame extends TfstFrame {
 
 		final Action saveAction = new AbstractAction("Save") {
 			@Override
+
 			public void actionPerformed(ActionEvent arg0) {
 				if(containsEmptyState()) {
 					JOptionPane.showMessageDialog(null,
@@ -579,6 +588,157 @@ public class TextAutomatonFrame extends TfstFrame {
 		};
 		final JButton saveTfstButton = new JButton(saveAction);
 		cornerPanel.add(saveTfstButton);
+		
+/*		final Action testsaveAction1 = new AbstractAction("Save best path") {
+			
+			public void actionPerformed(ActionEvent arg0) {
+				if(containsEmptyState()) {
+					JOptionPane.showMessageDialog(null,
+							"Warning: the automaton can't contain empty boxes",
+							"Warning",
+							JOptionPane.WARNING_MESSAGE);
+					return;
+					
+				}
+				
+			        try {
+			 
+			            File file = new File(Config.getCurrentSntDir(),
+								"best_path.tfst");
+			 
+			            if (file.createNewFile()) {
+			                System.out.println("File 1 is created!");
+			            } else {
+			                System.out.println("File 1 already exists.");
+			            }
+			 
+			        } catch (IOException e) {
+			            e.printStackTrace();
+			        }
+				GlobalProjectManager.search(null).getFrameManagerAs(InternalFrameManager.class)
+						.closeTextAutomatonFrame();
+				GlobalProjectManager.search(null).getFrameManagerAs(InternalFrameManager.class)
+						.closeTfstTagsFrame();
+				Config.cleanTfstFiles(false);
+				
+				final RebuildTfstCommand command = new RebuildTfstCommand()
+						.automaton(new File(Config.getCurrentSntDir(),
+								"text.tfst"));
+				Launcher.exec(command, true,
+						new RebuildTextAutomatonDo(Config.getCurrentSntDir()));
+				
+				InputStream inStream = null;
+		        OutputStream outStream = null;
+
+	        	System.out.println("Start copying files...!");
+	            try {
+					inStream = new FileInputStream(new File(Config.getCurrentSntDir(),
+							"text.tfst"));
+					outStream = new FileOutputStream(new File(Config.getCurrentSntDir(),
+							"best_path.tfst"));
+				} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+	 
+	            int length;
+	            byte[] buffer = new byte[1024];
+	 
+	            // copy the file content in bytes
+	            try {
+					while ((length = inStream.read(buffer)) > 0) {
+					    outStream.write(buffer, 0, length);
+					}
+					inStream.close();
+					outStream.close();
+					
+					System.out.println("File is copied successful!");
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}			    				
+
+			}
+
+		};
+		final JButton testsaveTfstButton1 = new JButton(testsaveAction1);
+		cornerPanel.add(testsaveTfstButton1);
+		
+		final Action testsaveAction2 = new AbstractAction("Save 2nd best path") {
+			
+			public void actionPerformed(ActionEvent arg0) {
+				if(containsEmptyState()) {
+					JOptionPane.showMessageDialog(null,
+							"Warning: the automaton can't contain empty boxes",
+							"Warning",
+							JOptionPane.WARNING_MESSAGE);
+					return;
+					
+				}
+				
+			        try {
+			 
+			            File file = new File(Config.getCurrentSntDir(),
+								"2nd_best_path.tfst");
+			 
+			            if (file.createNewFile()) {
+			                System.out.println("File 2 is created!");
+			            } else {
+			                System.out.println("File 2 already exists.");
+			            }
+			 
+			        } catch (IOException e) {
+			            e.printStackTrace();
+			        }
+				GlobalProjectManager.search(null).getFrameManagerAs(InternalFrameManager.class)
+						.closeTextAutomatonFrame();
+				GlobalProjectManager.search(null).getFrameManagerAs(InternalFrameManager.class)
+						.closeTfstTagsFrame();
+				Config.cleanTfstFiles(false);
+				
+				final RebuildTfstCommand command = new RebuildTfstCommand()
+						.automaton(new File(Config.getCurrentSntDir(),
+								"text.tfst"));
+				Launcher.exec(command, true,
+						new RebuildTextAutomatonDo(Config.getCurrentSntDir()));
+				
+				InputStream inStream = null;
+		        OutputStream outStream = null;
+
+	        	System.out.println("Start copying files...!");
+	            try {
+					inStream = new FileInputStream(new File(Config.getCurrentSntDir(),
+							"text.tfst"));
+					outStream = new FileOutputStream(new File(Config.getCurrentSntDir(),
+							"2nd_best_path.tfst"));
+				} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+	 
+	            int length;
+	            byte[] buffer = new byte[1024];
+	 
+	            // copy the file content in bytes
+	            try {
+					while ((length = inStream.read(buffer)) > 0) {
+					    outStream.write(buffer, 0, length);
+					}
+					inStream.close();
+					outStream.close();
+					
+					System.out.println("File is copied successful!");
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}			    				
+
+			}
+
+		};
+		final JButton testsaveTfstButton2 = new JButton(testsaveAction2);
+		cornerPanel.add(testsaveTfstButton2);		
+*/
 		final JButton elagButton = new JButton("Elag Frame");
 		elagButton.addActionListener(new ActionListener() {
 			@Override
@@ -816,12 +976,29 @@ public class TextAutomatonFrame extends TfstFrame {
 			 * We save each modification, but only if the sentence graph loading
 			 * is terminated
 			 */
-			final GraphIO g = new GraphIO(graphicalZone);
+			final TfstGraphIO g = new TfstGraphIO(graphicalZone);
 			g.saveSentenceGraph(new File(sentence_modified.getAbsolutePath()
 					+ n + ".grf"), graphicalZone.getGraphPresentationInfo());
 		}
 	}
-
+/*
+	void setModified(boolean b) {
+		repaint();
+		revertSentenceGraph.setVisible(b);
+		final int n = spinnerModel.getNumber().intValue();
+		if (b && !isAcurrentLoadingThread && n != 0) {
+		
+			/*
+			 * We save each modification, but only if the sentence graph loading
+			 * is terminated
+			 */
+/*
+			final TfstGraphIO g = new TfstGraphIO(graphicalZone);
+			g.saveSentenceGraph(new File(sentence_modified.getAbsolutePath()
+					+ n + ".grf"), graphicalZone.getGraphPresentationInfo());
+		}
+	}
+*/
 	private int readSentenceCount(File f) {
 		String s = "0";
 		try {
@@ -974,7 +1151,6 @@ public class TextAutomatonFrame extends TfstFrame {
 		}
 		return s;
 	}
-
 	boolean loadSentenceGraph(File file,int sentence) {
 		setModified(false);
 		final GraphIO g = GraphIO.loadGraph(file, true, true);
@@ -998,7 +1174,31 @@ public class TextAutomatonFrame extends TfstFrame {
 		t.start();
 		return true;
 	}
-
+/*
+	boolean loadSentenceGraph(File file,int sentence) {
+		setModified(false);
+		final GraphIO g = GraphIO.loadGraph(file, true, true);
+		if (g == null) {
+			return false;
+		}
+		textfield.setFont(g.getInfo().getInput().getFont());
+		graphicalZone.setup(g,sentence);
+		tfstTableModel.init(g.getBoxes());
+		final Timer t = new Timer(300, new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (ConfigManager.getManager().isRightToLeftForGraphs(null)) {
+					tfstScrollbar.setValue(tfstScrollbar.getMaximum());
+				} else {
+					tfstScrollbar.setValue(0);
+				}
+			}
+		});
+		t.setRepeats(false);
+		t.start();
+		return true;
+	}
+*/
 	boolean loadElagSentenceGraph(File file) {
 		setModified(false);
 		final GraphIO g = GraphIO.loadGraph(file, true, true);
@@ -1183,7 +1383,7 @@ public class TextAutomatonFrame extends TfstFrame {
 		public RebuildTextAutomatonDo(File sntDir) {
 			this.sntDir = sntDir;
 		}
-
+		
 		@Override
 		public void toDo(boolean success) {
 			FileUtil.deleteFileByName(new File(sntDir, "sentence*.grf"));
